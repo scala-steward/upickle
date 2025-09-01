@@ -26,7 +26,7 @@
   )
 )
 
-@sect("uPickle 4.2.0")
+@sect("uPickle 4.3.0")
   @div(display.flex, alignItems.center, flexDirection.column)
     @div
       @a(href := "https://www.patreon.com/lihaoyi")(
@@ -71,8 +71,8 @@
 
   @sect{Getting Started}
     @hl.scala
-      "com.lihaoyi" %% "upickle" % "4.2.0" // SBT
-      ivy"com.lihaoyi::upickle:4.2.0" // Mill
+      "com.lihaoyi" %% "upickle" % "4.3.0" // SBT
+      ivy"com.lihaoyi::upickle:4.3.0" // Mill
 
     @p
       And then you can immediately start writing and reading common Scala
@@ -94,8 +94,8 @@
       @p
         For ScalaJS applications, use this dependencies instead:
       @hl.scala
-        "com.lihaoyi" %%% "upickle" % "4.2.0" // SBT
-        ivy"com.lihaoyi::upickle::4.2.0" // Mill
+        "com.lihaoyi" %%% "upickle" % "4.3.0" // SBT
+        ivy"com.lihaoyi::upickle::4.3.0" // Mill
 
     @sect{Scala Versions}
       @p
@@ -239,7 +239,7 @@
           for Scala 3.7.0 and above:
 
         @hl.scala
-          ivy"com.lihaoyi::upickle-implicits-named-tuples:4.2.0" // Mill build config
+          ivy"com.lihaoyi::upickle-implicits-named-tuples:4.3.0" // Mill build config
 
         @p
           You can read/write any named tuple value, as long as the fields can also be read/written,
