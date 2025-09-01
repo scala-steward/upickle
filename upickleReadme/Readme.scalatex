@@ -1031,6 +1031,14 @@
       JSON library, and inherits a lot of it's performance from Erik's work.
 
   @sect{Version History}
+    @sect{4.3.0}
+      @ul
+        @li
+          Added @hl.scala{upickle.*} aliases for all @hl.scala{upickle.default.*}
+          APIs in Scala 3.x. These are now the recommended way of interacting with
+          uPickle @lnk("#675", "https://github.com/com-lihaoyi/upickle/pull/675"),
+          though the old style is still supported for backwards compatibility and
+          for Scala 2.x
     @sect{4.2.1}
       @ul
         @li

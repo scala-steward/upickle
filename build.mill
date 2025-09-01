@@ -55,6 +55,11 @@ trait CommonPublishModule
 
   def mimaPreviousVersions = Seq(
     "4.0.0",
+    "4.0.1",
+    "4.0.2",
+    "4.1.0",
+    //    "4.2.0", publishing failed on this one for some reason
+    "4.2.1",
   )
   def isDotty = crossScalaVersion.startsWith("0") || crossScalaVersion.startsWith("3")
   def pomSettings = PomSettings(
