@@ -219,11 +219,20 @@ object ujson extends Module{
     )
   }
 
-  object circe extends Cross[CirceModule](scalaVersions)
-  trait CirceModule extends CommonPublishModule{
-    def moduleDeps = Seq(ujson.jvm())
-    val circeVersion = "0.14.9"
-    def mvnDeps = Seq(mvn"io.circe::circe-parser:$circeVersion")
+  object circe extends Module {
+    object jvm extends Cross[CirceJvmModule](scalaVersions)
+    trait CirceJvmModule extends CommonJvmModule{
+      def moduleDeps = Seq(ujson.jvm())
+      val circeVersion = "0.14.14"
+      def mvnDeps = Seq(mvn"io.circe::circe-parser:$circeVersion")
+    }
+
+    object native extends Cross[CirceNativeModule](scalaVersions)
+    trait CirceNativeModule extends CommonNativeModule{
+      def moduleDeps = Seq(ujson.native())
+      val circeVersion = "0.14.14"
+      def mvnDeps = Seq(mvn"io.circe::circe-parser:$circeVersion")
+    }
   }
 
   object play extends Cross[PlayModule](scala2JVMVersions)
@@ -378,7 +387,7 @@ object upickle extends Module{
         Seq(core.jvm().test) ++
         (
           if (isDotty) Nil
-          else Seq(ujson.argonaut(), ujson.circe(), ujson.json4s(), ujson.play())
+          else Seq(ujson.argonaut(), ujson.circe.jvm(), ujson.json4s(), ujson.play())
         )
     }
 
@@ -417,9 +426,9 @@ trait BenchModule extends CommonPlatformModule{
   def crossScalaVersion = scala213
   def scalaVersion = scala213
   def mvnDeps = Seq(
-    mvn"io.circe::circe-core::0.14.9",
-    mvn"io.circe::circe-generic::0.14.9",
-    mvn"io.circe::circe-parser::0.14.9",
+    mvn"io.circe::circe-core::0.14.14",
+    mvn"io.circe::circe-generic::0.14.14",
+    mvn"io.circe::circe-parser::0.14.14",
     mvn"com.typesafe.play::play-json::2.9.4",
     mvn"io.argonaut::argonaut:6.2.6",
     mvn"org.json4s::json4s-ast:3.6.12",
