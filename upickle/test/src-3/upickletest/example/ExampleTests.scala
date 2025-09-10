@@ -299,6 +299,31 @@ object ExampleTests extends TestSuite {
       upickle.read[Thing](original: CharSequence) ==> Thing(1, "gg")
       upickle.read[Thing](original.getBytes) ==> Thing(1, "gg")
     }
+    test("other"){
+      test("circe"){
+        import ujson.circe.CirceJson
+
+        val circeJson: io.circe.Json = CirceJson(
+          """["hello", "world"]"""
+        )
+
+        val updatedCirceJson =
+          circeJson.mapArray(_.map(x => x.mapString(_.toUpperCase)))
+
+        val items: Seq[String] = CirceJson.transform(
+          updatedCirceJson,
+          upickle.default.reader[Seq[String]]
+        )
+
+        items ==> Seq("HELLO", "WORLD")
+
+        val rewritten = upickle.default.transform(items).to(CirceJson)
+
+        val stringified = CirceJson.transform(rewritten, StringRenderer()).toString
+
+        stringified ==> """["HELLO","WORLD"]"""
+      }
+    }
     test("mapped"){
       test("simple"){
         case class Wrap(i: Int)

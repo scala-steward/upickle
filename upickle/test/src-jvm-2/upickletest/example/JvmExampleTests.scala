@@ -45,27 +45,6 @@ object JvmExampleTests extends TestSuite {
 
         stringified ==> """["HELLO","WORLD"]"""
       }
-      test("circe"){
-        val circeJson: io.circe.Json = CirceJson(
-          """["hello", "world"]"""
-        )
-
-        val updatedCirceJson =
-          circeJson.mapArray(_.map(x => x.mapString(_.toUpperCase)))
-
-        val items: Seq[String] = CirceJson.transform(
-          updatedCirceJson,
-          upickle.default.reader[Seq[String]]
-        )
-
-        items ==> Seq("HELLO", "WORLD")
-
-        val rewritten = upickle.default.transform(items).to(CirceJson)
-
-        val stringified = CirceJson.transform(rewritten, StringRenderer()).toString
-
-        stringified ==> """["HELLO","WORLD"]"""
-      }
       test("json4s"){
         import org.json4s.JsonAST
         val json4sJson: JsonAST.JValue = Json4sJson(
