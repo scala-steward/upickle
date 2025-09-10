@@ -82,5 +82,42 @@ object UnitTests extends TestSuite{
       val bytes2 = upack.write(parsed)
       assert(bytes1 sameElements bytes2)
     }
+    test("reader.parse until EOF"){
+      val msgs = List(upack.Int32(1), upack.Int32(2), upack.Int32(3), upack.Int32(4))
+      val out = new ByteArrayOutputStream()
+      msgs.foreach(_.writeBytesTo(out))
+      val bytes = out.toByteArray()
+      val in = new ByteArrayInputStream(bytes)
+      val reader = new upack.InputStreamMsgPackReader(in)
+      def readOne(): upack.Msg =
+        reader.parse(upack.Msg)
+
+      readOne() ==> upack.Int32(1)
+      readOne() ==> upack.Int32(2)
+      readOne() ==> upack.Int32(3)
+      readOne() ==> upack.Int32(4)
+      intercept[java.io.EOFException]{
+        readOne()
+      }
+    }
+    test("truncated input EOF"){
+      val msg = upack.Arr(upack.Int32(1), upack.Int32(2), upack.Int32(3), upack.Int32(4))
+      val bytes = upack.write(msg)
+      val truncatedBytes = bytes.take(2)
+
+      // upack.MsgPackReader has its own growBuffer override that throws
+      test("upack.MsgPackReader"){
+        intercept[java.io.EOFException]{
+          upack.read(truncatedBytes) ==> msg
+        }
+      }
+      // upack.InputStreamMsgPackReader uses BufferingElemParser semantics
+      test("upack.InputStreamMsgPackReader"){
+        intercept[java.io.EOFException]{
+          val in = new ByteArrayInputStream(truncatedBytes)
+          upack.read(in) ==> msg
+        }
+      }
+    }
   }
 }
