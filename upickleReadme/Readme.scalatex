@@ -794,7 +794,7 @@
         @hl.scala
           libraryDependencies += "com.lihaoyi" %% "ujson-circe" % "0.9.6"
         @b{Usage}
-        @hl.ref(jvmExampleTests, Seq("\"circe\"", ""), "}")
+        @hl.ref(exampleTests, Seq("\"circe\"", ""), "}")
 
       @sect{Play-Json}
         @b{Maven Coordinates}
