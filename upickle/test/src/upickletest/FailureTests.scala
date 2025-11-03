@@ -81,6 +81,11 @@ object TaggedCustomSerializer{
     implicit val rw: upickle.default.ReadWriter[IsInt] = upickle.default.readwriter[Int].bimap[IsInt](_.value, IsInt(_))
   }
 }
+
+case class AllDefaults(i: Int = 1)
+object AllDefaults{
+  implicit def rw: upickle.default.ReadWriter[AllDefaults] = upickle.default.macroRW
+}
 /**
 * Generally, every failure should be a Invalid.Json or a
 * InvalidData. If any assertion errors, match errors, number
@@ -347,6 +352,19 @@ object FailureTests extends TestSuite {
       }
 
       assert(error.getMessage.startsWith("assertion failed: Can only merge Readers of case classes"))
+    }
+    test("allDefaultCaseClass") {
+      import upickle.default._
+
+      val error = intercept[java.lang.Exception] {
+        upickle.default.read[AllDefaults]("\"hello\"")
+      }
+
+      error match{
+        case e: upickle.core.TraceVisitor.TraceException =>
+          assert(e.getMessage == "$")
+          assert(e.getCause.getMessage == "expected dictionary got string at index 0")
+      }
     }
   }
 }
