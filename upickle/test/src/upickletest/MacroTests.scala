@@ -215,6 +215,41 @@ object Flatten {
   object Collection {
     implicit val rw: RW[Collection] = upickle.default.macroRW
   }
+
+  // Test cases for generalized key types (non-String keys)
+  case class FlattenIntKey(i: Int, @upickle.implicits.flatten m: Map[Int, String])
+  object FlattenIntKey {
+    implicit val rw: RW[FlattenIntKey] = upickle.default.macroRW
+  }
+
+  case class FlattenSeqIntKey(@upickle.implicits.flatten n: Seq[(Int, String)])
+  object FlattenSeqIntKey {
+    implicit val rw: RW[FlattenSeqIntKey] = upickle.default.macroRW
+  }
+
+  case class FlattenLongKey(@upickle.implicits.flatten m: Map[Long, Int])
+  object FlattenLongKey {
+    implicit val rw: RW[FlattenLongKey] = upickle.default.macroRW
+  }
+
+  // Test case for BufferedValue keys to verify index is preserved
+  object BufferedValueKey {
+    import upickle.core.{BufferedValue, Visitor}
+
+    private implicit val bufferedR: upickle.default.Reader[BufferedValue] =
+      new upickle.default.Reader.Delegate(BufferedValue.Builder)
+
+    private implicit val bufferedW: upickle.default.Writer[BufferedValue] =
+      new upickle.default.Writer[BufferedValue] {
+        def write0[V](out: Visitor[_, V], v: BufferedValue): V =
+          BufferedValue.transform(v, out)
+      }
+
+    case class FlattenBufferedKey(@upickle.implicits.flatten m: Map[BufferedValue, String])
+    object FlattenBufferedKey {
+      implicit val rw: RW[FlattenBufferedKey] = upickle.default.macroRW
+    }
+  }
 }
 
 object MacroTests extends TestSuite {
@@ -1002,5 +1037,55 @@ object MacroTests extends TestSuite {
        val value = Collection(scala.collection.mutable.LinkedHashMap("a" -> ValueClass(3.0), "b" -> ValueClass(4.0)))
        rw(value, """{"a":{"value":3},"b":{"value":4}}""")
      }
+
+    test("flattenIntKey") {
+      import Flatten._
+      val value = FlattenIntKey(10, Map(1 -> "one", 2 -> "two"))
+      rw(value, """{"i":10,"1":"one","2":"two"}""")
+    }
+
+    test("flattenSeqIntKey") {
+      import Flatten._
+      val value = FlattenSeqIntKey(Seq(1 -> "one", 2 -> "two"))
+      rw(value, """{"1":"one","2":"two"}""")
+    }
+
+    test("flattenLongKey") {
+      import Flatten._
+      val value = FlattenLongKey(Map(100L -> 1, 200L -> 2))
+      rw(value, """{"100":1,"200":2}""")
+    }
+
+    test("flattenBufferedValueKey") {
+      import Flatten.BufferedValueKey._
+      import upickle.core.BufferedValue
+
+      // Read JSON and verify that keys are BufferedValue.Str with correct index values
+      // Index is the position of the opening quote character
+      // {"foo":"value1","bar":"value2"}
+      // 0         1         2         3
+      // 0123456789012345678901234567890
+      val json = """{"foo":"value1","bar":"value2"}"""
+      val result = upickle.default.read[FlattenBufferedKey](json)
+
+      // Get the keys and verify they are BufferedValue.Str with appropriate indices
+      val keys = result.m.keys.toList.sortBy(_.asInstanceOf[BufferedValue.Str].value0.toString)
+      assert(keys.length == 2)
+
+      // "bar" key starts at index 16 (the opening quote)
+      val barKey = keys(0).asInstanceOf[BufferedValue.Str]
+      assert(barKey.value0.toString == "bar")
+      assert(barKey.index == 16)
+
+      // "foo" key starts at index 1 (the opening quote)
+      val fooKey = keys(1).asInstanceOf[BufferedValue.Str]
+      assert(fooKey.value0.toString == "foo")
+      assert(fooKey.index == 1)
+
+      // Verify round-trip works
+      val written = upickle.default.write(result)
+      val reread = upickle.default.read[FlattenBufferedKey](written)
+      assert(reread.m.size == result.m.size)
+    }
   }
 }

@@ -107,7 +107,7 @@ trait NamedTupleReadWriters[
       fieldNames: N,
       fieldReaders: () => Tuple.Map[V, outer.Reader],
       strict: Boolean
-  ) extends outer.CaseClassReader3V2[NamedTuple[N, V]](
+  ) extends outer.CaseClassReader3V3[NamedTuple[N, V]](
         paramCount,
         if paramCount <= 64 then
           if paramCount == 64 then -1 else (1L << paramCount) - 1
@@ -121,14 +121,12 @@ trait NamedTupleReadWriters[
     private val fN_Map: scala.collection.mutable.Map[String, Int] =
       fN.zipWithIndex.to(scala.collection.mutable.HashMap).withDefaultValue(-1)
 
-    override def visitors0: (AnyRef, Array[AnyRef]) = (null, fR)
+    override def visitors0: ((AnyRef, AnyRef), Array[AnyRef]) = ((null, null), fR)
 
     override def keyToIndex(x: String): Int = fN_Map(x)
 
     override def allKeysArray: Array[String] = fN
 
-    override def storeDefaults(
-        x: upickle.implicits.BaseCaseObjectContext
-    ): Unit = ()
+    override def storeDefaults(x: upickle.implicits.BaseCaseObjectContext2): Unit = ()
   }
 }
