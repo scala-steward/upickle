@@ -26,7 +26,7 @@
   )
 )
 
-@sect("uPickle 4.4.1")
+@sect("uPickle 4.4.2")
   @div(display.flex, alignItems.center, flexDirection.column)
     @div
       @a(href := "https://www.patreon.com/lihaoyi")(
@@ -71,8 +71,8 @@
 
   @sect{Getting Started}
     @hl.scala
-      "com.lihaoyi" %% "upickle" % "4.4.1" // SBT
-      ivy"com.lihaoyi::upickle:4.4.1" // Mill
+      "com.lihaoyi" %% "upickle" % "4.4.2" // SBT
+      ivy"com.lihaoyi::upickle:4.4.2" // Mill
 
     @p
       And then you can immediately start writing and reading common Scala
@@ -94,8 +94,8 @@
       @p
         For ScalaJS applications, use this dependencies instead:
       @hl.scala
-        "com.lihaoyi" %%% "upickle" % "4.4.1" // SBT
-        ivy"com.lihaoyi::upickle::4.4.1" // Mill
+        "com.lihaoyi" %%% "upickle" % "4.4.2" // SBT
+        ivy"com.lihaoyi::upickle::4.4.2" // Mill
 
     @sect{Scala Versions}
       @p
@@ -239,7 +239,7 @@
           for Scala 3.7.0 and above:
 
         @hl.scala
-          ivy"com.lihaoyi::upickle-implicits-named-tuples:4.4.1" // Mill build config
+          ivy"com.lihaoyi::upickle-implicits-named-tuples:4.4.2" // Mill build config
 
         @p
           You can read/write any named tuple value, as long as the fields can also be read/written,
@@ -1031,6 +1031,11 @@
       JSON library, and inherits a lot of it's performance from Erik's work.
 
   @sect{Version History}
+    @sect{4.4.2}
+      @ul
+        @li
+          Generalize @hl.scala("@flatten") annotation to work on any JSON-serializable key type rather
+          than just @hl.scala{String} @lnk("#694", "https://github.com/com-lihaoyi/upickle/pull/694")
     @sect{4.4.1}
       @ul
         @li
